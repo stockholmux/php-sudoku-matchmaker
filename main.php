@@ -5,15 +5,17 @@ if(!extension_loaded('redis')){
   throw new Exception("install redis extension, pecl install redis");
 }
 
-if ($argc == 1) {
-  echo("Usage: php ./main.php <port>\r\n");
+if ($argc !== 4) {
+  echo("Usage: php ./main.php <port> <redis host> <redis port>\r\n");
   exit();
 }
 $port = $argv[1];
+$redisHost = $argv[2];
+$redisPort = $argv[3];
 
 $http = new Swoole\HTTP\Server("127.0.0.1", $port);
 $redis = new Redis();
-$redis->connect('127.0.0.1', 6379);
+$redis->connect($redisHost, $redisPort);
 //$redis->auth('foobared');
 
 $http->on('request', function ($request, $response) use ($redis) {
