@@ -9,15 +9,6 @@ if ($argc == 1) {
 $instanceID = $argv[1];
 
 
-
-
-
-
-//$http = new swoole_http_server("127.0.0.1", 9501);
-  
-
-
-
 Swoole\Runtime::enableCoroutine();
 
 go(function() use ($instanceID) {
