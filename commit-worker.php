@@ -32,9 +32,9 @@ go(function() use ($instanceID) {
             
             foreach ($streamEntries as $entry) {
               $entryId = $entry[0];
-              echo "$streamByKey / $entryId\r\n";
+              echo "$entryId\r\n";
               $entryFields = sequentialToAssociativeArray($entry[1]);
-              process_match($redis, $commit_name, $entry_id, $streamEntries);
+              process_match($redis, $stream_name, $entryId, $entryFields);
             }      
           } 
           // Ask for more matches
