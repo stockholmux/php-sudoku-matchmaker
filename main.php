@@ -38,12 +38,30 @@ $http->on('request', function ($request, $response) use ($redis) {
       $response->status(400);
       $response->end("Request invalid");
     }
+  } elseif ($uri === '/accept_match') {
+    //FYI - not fully implemented elsewhere
+    $match_id = $request->get['mid'];
+    if (strlen($match_id) > 0 ) {
+      $match_key = KEYNS . "match:" . $match_id;
+      $match = $redis->hgetall($match_key);
+      $state = $match["state"];
+      if ($state == "WAITING_P2") {
+        // Choose a random partition of the commit stream to update
+        $partition = add_slot(KEYNS . "commit", rand(0, COMMIT_PARTITIONS));
+        $new_action = MUST_LOCK_P2;
+        $redis->xAdd($partition, '*', ['match_id'=> $match_id, 'p1'=>$match['p1'], 'p2'=>$match['p2'], 'game'=>$match['game'], 'action'=> $new_action]);
+      }
+      $response->header('Content-Type', 'application/json');
+      $response->end("{\"ok\": True}");
+    } else {
+      $response->status(400);
+      $response->end("Request invalid");
+    }
+
   } else {
     $response->status(404);
     $response->end("No valid route");
   }
-  
-  
 });
 
 $http->on('start', function ($server) use ($port) {
